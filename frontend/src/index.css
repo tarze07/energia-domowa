@@ -1,0 +1,99 @@
+:root {
+  color-scheme: dark;
+  --bg: #12140f;
+  --panel: #1b1f16;
+  --ink: #efe7d2;
+  --muted: #9a937c;
+  --line: #2d3324;
+  --accent: #e2b54a;
+  --accent-2: #7cb389;
+  --danger: #d36b4f;
+  --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+  font-family: "Sora", "Segoe UI", sans-serif;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { margin: 0; min-height: 100%; background: var(--bg); color: var(--ink); }
+body {
+  background:
+    radial-gradient(900px 420px at 10% -10%, rgba(226, 181, 74, 0.12), transparent 55%),
+    var(--bg);
+}
+
+.shell { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+aside {
+  border-right: 1px solid var(--line);
+  padding: 28px 18px;
+  background: #15180f;
+}
+.brand { display: flex; gap: 12px; align-items: center; margin-bottom: 36px; }
+.brand strong { display: block; letter-spacing: 0.04em; }
+.brand small { color: var(--muted); }
+.mark {
+  width: 42px; height: 42px; display: grid; place-items: center;
+  border-radius: 12px; background: var(--accent); color: #1a1404; font-size: 22px;
+}
+nav { display: grid; gap: 8px; }
+nav button, button {
+  font: inherit; cursor: pointer; border: 0; border-radius: 10px;
+}
+nav button {
+  text-align: left; padding: 10px 12px; background: transparent; color: var(--muted);
+}
+nav button.active, nav button:hover { background: #232818; color: var(--ink); }
+main { padding: 32px 40px 64px; }
+.stack { display: grid; gap: 22px; max-width: 1100px; }
+.page-head h1 { margin: 0; font-size: 34px; font-weight: 600; }
+.eyebrow { margin: 0 0 6px; color: var(--accent); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; }
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.kpi, .panel {
+  background: var(--panel); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow);
+}
+.kpi { padding: 18px; display: grid; gap: 6px; }
+.kpi span, .muted, small { color: var(--muted); }
+.kpi strong { font-size: 26px; }
+.panel { padding: 18px 20px 22px; overflow: auto; }
+.panel-head, .row { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+.panel h2 { margin: 0 0 14px; font-size: 18px; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
+th { color: var(--muted); font-weight: 500; }
+.form { display: grid; gap: 12px; }
+.form.narrow { max-width: 420px; }
+label { display: grid; gap: 6px; font-size: 13px; color: var(--muted); }
+input, select {
+  font: inherit; color: var(--ink); background: #12150e; border: 1px solid var(--line);
+  border-radius: 10px; padding: 10px 12px;
+}
+.check { display: flex; align-items: center; gap: 8px; }
+button { background: var(--accent); color: #1a1404; padding: 10px 14px; font-weight: 600; }
+button.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+button.tiny { background: #2a3120; color: var(--ink); padding: 6px 8px; font-size: 12px; }
+button.tiny.danger { background: #3a221c; color: #f0c2b4; }
+.actions { display: flex; gap: 6px; justify-content: flex-end; }
+.chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.chips li {
+  display: flex; gap: 8px; align-items: center; padding: 6px 8px 6px 12px;
+  border: 1px solid var(--line); border-radius: 999px; font-size: 13px;
+}
+.chips span { color: var(--muted); }
+.alerts {
+  background: #3a2416; border: 1px solid #6a3d24; color: #f3d7c4;
+  border-radius: 14px; padding: 12px 16px;
+}
+.alerts p { margin: 6px 0; }
+.error { color: var(--danger); }
+.ok { color: var(--accent-2); margin: 0; }
+.dim { opacity: 0.55; }
+.chart { width: 100%; height: 240px; }
+.bar { fill: var(--accent-2); }
+.bar.over { fill: var(--danger); }
+.chart-limit { stroke: var(--accent); stroke-dasharray: 6 6; stroke-width: 1.5; }
+
+@media (max-width: 960px) {
+  .shell { grid-template-columns: 1fr; }
+  aside { border-right: 0; border-bottom: 1px solid var(--line); }
+  .kpis, .grid-2 { grid-template-columns: 1fr; }
+  main { padding: 20px; }
+}
