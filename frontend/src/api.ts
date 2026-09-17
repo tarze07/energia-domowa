@@ -40,7 +40,14 @@ export const api = {
   createReading: (body: unknown) =>
     request<MeterReading>('/api/readings', { method: 'POST', body: JSON.stringify(body) }),
   deleteReading: (id: number) => request<void>(`/api/readings/${id}`, { method: 'DELETE' }),
-  consumption: () => request<DailyConsumption[]>('/api/consumption'),
+  consumption: (from?: string, to?: string) => {
+    const query = new URLSearchParams()
+    if (from) query.set('from', from)
+    if (to) query.set('to', to)
+    const qs = query.toString()
+    const suffix = qs ? `?${qs}` : ''
+    return request<DailyConsumption[]>(`/api/consumption${suffix}`)
+  },
   upsertConsumption: (body: unknown) =>
     request<DailyConsumption>('/api/consumption', { method: 'POST', body: JSON.stringify(body) }),
   deleteConsumption: (id: number) =>

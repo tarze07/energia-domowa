@@ -60,6 +60,47 @@ public class DashboardController(AppDbContext db) : ControllerBase
         var overLimit = todayKwh > tariff.DailyLimitKwh && tariff.DailyLimitKwh > 0;
         var budgetUsed = tariff.MonthlyBudgetPln <= 0 ? 0 : Math.Round(monthCost / tariff.MonthlyBudgetPln * 100, 1);
 
+        var daysInMonth = DateTime.DaysInMonth(today.Year, today.Month);
+        var elapsed = today.Day;
+        var daysLeft = daysInMonth - elapsed;
+        var forecastKwh = elapsed > 0 ? Math.Round(monthKwh / elapsed * daysInMonth, 3) : 0;
+        var forecastCost = EnergyMath.Cost(forecastKwh, price);
+        DateOnly? exhaustion = null;
+        if (tariff.MonthlyBudgetPln > 0 && monthCost > 0 && forecastCost >= tariff.MonthlyBudgetPln)
+        {
+            var avgCost = monthCost / elapsed;
+            var dayNumber = (int)Math.Ceiling(tariff.MonthlyBudgetPln / avgCost);
+            dayNumber = Math.Clamp(dayNumber, 1, daysInMonth);
+            exhaustion = monthStart.AddDays(dayNumber - 1);
+        }
+
+        var roomGroups = devices
+            .GroupBy(d => d.Room.Name)
+            .Select(g =>
+            {
+                var daily = g.Sum(d => EnergyMath.DailyKwh(d.PowerWatts, d.HoursPerDay));
+                var monthly = Math.Round(daily * daysInMonth, 2);
+                return new
+                {
+                    Name = g.Key,
+                    Daily = daily,
+                    Monthly = monthly,
+                    Cost = EnergyMath.Cost(monthly, price)
+                };
+            })
+            .Where(x => x.Daily > 0)
+            .OrderByDescending(x => x.Daily)
+            .ToList();
+        var roomTotal = roomGroups.Sum(x => x.Daily);
+        var rooms = roomGroups
+            .Select(x => new RoomShareDto(
+                x.Name,
+                Math.Round(x.Daily, 3),
+                x.Monthly,
+                x.Cost,
+                roomTotal <= 0 ? 0 : Math.Round(x.Daily / roomTotal * 100, 1)))
+            .ToList();
+
         var alerts = new List<string>();
         if (overLimit)
         {
@@ -76,6 +117,18 @@ public class DashboardController(AppDbContext db) : ControllerBase
             alerts.Add("Zużycie jest wyraźnie wyższe niż suma szacunków urządzeń — sprawdź nieznane odbiorniki.");
         }
 
+        if (tariff.MonthlyBudgetPln > 0 && forecastCost > tariff.MonthlyBudgetPln)
+        {
+            var forecastAlert =
+                $"Przy obecnym tempie miesiąc zamknie się na {forecastCost:0.00} zł (budżet {tariff.MonthlyBudgetPln:0.00} zł).";
+            if (exhaustion is not null && exhaustion > today)
+            {
+                forecastAlert += $" Budżet skończy się {exhaustion.Value:dd.MM}.";
+            }
+
+            alerts.Add(forecastAlert);
+        }
+
         return Ok(new DashboardDto(
             todayKwh,
             EnergyMath.Cost(todayKwh, price),
@@ -89,8 +142,13 @@ public class DashboardController(AppDbContext db) : ControllerBase
             tariff.MonthlyBudgetPln,
             budgetUsed,
             overLimit,
+            forecastKwh,
+            forecastCost,
+            exhaustion,
+            daysLeft,
             alerts,
             chart,
-            top));
+            top,
+            rooms));
     }
 }

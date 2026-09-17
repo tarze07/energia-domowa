@@ -39,6 +39,13 @@ public record ChartPointDto(DateOnly Date, decimal Kwh, decimal Cost);
 
 public record TopDeviceDto(string Name, string RoomName, decimal DailyKwh, decimal MonthlyKwh, decimal MonthlyCost);
 
+public record RoomShareDto(
+    string Name,
+    decimal DailyKwh,
+    decimal MonthlyKwh,
+    decimal MonthlyCost,
+    decimal SharePercent);
+
 public record DashboardDto(
     decimal TodayKwh,
     decimal TodayCost,
@@ -52,6 +59,11 @@ public record DashboardDto(
     decimal MonthlyBudgetPln,
     decimal BudgetUsedPercent,
     bool OverDailyLimit,
+    decimal ForecastMonthKwh,
+    decimal ForecastMonthCost,
+    DateOnly? BudgetExhaustionDate,
+    int DaysLeftInMonth,
     IReadOnlyList<string> Alerts,
     IReadOnlyList<ChartPointDto> Last30Days,
-    IReadOnlyList<TopDeviceDto> TopDevices);
+    IReadOnlyList<TopDeviceDto> TopDevices,
+    IReadOnlyList<RoomShareDto> Rooms);

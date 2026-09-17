@@ -1,8 +1,19 @@
 import { useEffect, useState } from 'react'
 import { api } from '../api'
 import { BarChart } from '../components/BarChart'
-import { fmtKwh, fmtPln } from '../format'
+import { fmtDate, fmtKwh, fmtPln, todayIso } from '../format'
 import type { Dashboard } from '../types'
+
+function forecastHint(data: Dashboard, today: string): string {
+  if (data.budgetExhaustionDate) {
+    const when = fmtDate(data.budgetExhaustionDate)
+    if (data.budgetExhaustionDate <= today) {
+      return `Budżet wyczerpany od ${when}.`
+    }
+    return `Przy tym tempie budżet skończy się ${when}.`
+  }
+  return `Prognoza w budżecie ${fmtPln(data.monthlyBudgetPln)}.`
+}
 
 export function DashboardPage() {
   const [data, setData] = useState<Dashboard | null>(null)
@@ -71,10 +82,68 @@ export function DashboardPage() {
 
       <section className="panel">
         <div className="panel-head">
+          <h2>Prognoza końca miesiąca</h2>
+          <small>{data.daysLeftInMonth} dni zostało</small>
+        </div>
+        {data.forecastMonthKwh === 0 ? (
+          <p className="muted">Brak danych do prognozy.</p>
+        ) : (
+          <>
+            <p className="forecast-num">
+              <strong>{fmtKwh(data.forecastMonthKwh)}</strong>
+              <span>{fmtPln(data.forecastMonthCost)}</span>
+            </p>
+            {data.monthlyBudgetPln > 0 && (
+              <>
+                <p className="muted">
+                  {forecastHint(data, todayIso())}
+                </p>
+                <div className="meter">
+                  <div
+                    className={data.forecastMonthCost > data.monthlyBudgetPln ? 'meter-fill over' : 'meter-fill'}
+                    style={{
+                      width: `${Math.min(100, (data.monthCost / data.monthlyBudgetPln) * 100)}%`,
+                    }}
+                  />
+                </div>
+              </>
+            )}
+          </>
+        )}
+      </section>
+
+      <section className="panel">
+        <div className="panel-head">
           <h2>Ostatnie 30 dni</h2>
           <small>Linia = dzienny limit</small>
         </div>
         <BarChart points={data.last30Days} limit={data.dailyLimitKwh} />
+      </section>
+
+      <section className="panel">
+        <div className="panel-head">
+          <h2>Zużycie wg pomieszczeń</h2>
+          <small>szacunek urządzeń</small>
+        </div>
+        {data.rooms.length === 0 ? (
+          <p className="muted">Brak aktywnych urządzeń.</p>
+        ) : (
+          <div className="room-list">
+            {data.rooms.map((room) => (
+              <div key={room.name} className="room-row">
+                <div className="row">
+                  <strong>{room.name}</strong>
+                  <small>
+                    {fmtKwh(room.dailyKwh)}/d · {fmtPln(room.monthlyCost)} · {room.sharePercent}%
+                  </small>
+                </div>
+                <div className="meter">
+                  <div className="meter-fill" style={{ width: `${room.sharePercent}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="panel">

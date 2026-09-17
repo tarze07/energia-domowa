@@ -54,6 +54,14 @@ export type TopDevice = {
   monthlyCost: number
 }
 
+export type RoomShare = {
+  name: string
+  dailyKwh: number
+  monthlyKwh: number
+  monthlyCost: number
+  sharePercent: number
+}
+
 export type Dashboard = {
   todayKwh: number
   todayCost: number
@@ -67,9 +75,14 @@ export type Dashboard = {
   monthlyBudgetPln: number
   budgetUsedPercent: number
   overDailyLimit: boolean
+  forecastMonthKwh: number
+  forecastMonthCost: number
+  budgetExhaustionDate: string | null
+  daysLeftInMonth: number
   alerts: string[]
   last30Days: ChartPoint[]
   topDevices: TopDevice[]
+  rooms: RoomShare[]
 }
 
-export type Page = 'pulpit' | 'urzadzenia' | 'zuzycie' | 'taryfa'
+export type Page = 'pulpit' | 'rok' | 'urzadzenia' | 'zuzycie' | 'taryfa'

@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { DashboardPage } from './pages/DashboardPage'
 import { DevicesPage } from './pages/DevicesPage'
+import { HeatmapPage } from './pages/HeatmapPage'
 import { TariffPage } from './pages/TariffPage'
 import { UsagePage } from './pages/UsagePage'
 import type { Page } from './types'
 
 const nav: { id: Page; label: string }[] = [
   { id: 'pulpit', label: 'Pulpit' },
+  { id: 'rok', label: 'Rok' },
   { id: 'urzadzenia', label: 'Urządzenia' },
   { id: 'zuzycie', label: 'Zużycie' },
   { id: 'taryfa', label: 'Taryfa' },
@@ -40,6 +42,7 @@ export default function App() {
       </aside>
       <main>
         {page === 'pulpit' && <DashboardPage />}
+        {page === 'rok' && <HeatmapPage />}
         {page === 'urzadzenia' && <DevicesPage />}
         {page === 'zuzycie' && <UsagePage />}
         {page === 'taryfa' && <TariffPage />}
