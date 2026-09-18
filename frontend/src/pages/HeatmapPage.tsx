@@ -10,21 +10,27 @@ function isoDay(year: number, monthIndex: number, day: number): string {
   return `${year}-${String(monthIndex + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
-function heatClass(kwh: number | undefined, limit: number): string {
-  if (kwh == null) return ''
-  if (limit > 0) {
-    if (kwh > limit) return 'over'
-    const ratio = kwh / limit
-    if (ratio >= 0.8) return 'l3'
-    if (ratio >= 0.5) return 'l2'
-    if (ratio > 0) return 'l1'
-    return 'l0'
-  }
+function heatByLimit(kwh: number, limit: number): string {
+  if (kwh > limit) return 'over'
+  const ratio = kwh / limit
+  if (ratio >= 0.8) return 'l3'
+  if (ratio >= 0.5) return 'l2'
+  if (ratio > 0) return 'l1'
+  return 'l0'
+}
+
+function heatByKwh(kwh: number): string {
   if (kwh > 12) return 'over'
   if (kwh > 8) return 'l3'
   if (kwh > 5) return 'l2'
   if (kwh > 0) return 'l1'
   return 'l0'
+}
+
+function heatClass(kwh: number | undefined, limit: number): string {
+  if (kwh == null) return ''
+  if (limit > 0) return heatByLimit(kwh, limit)
+  return heatByKwh(kwh)
 }
 
 export function HeatmapPage() {
